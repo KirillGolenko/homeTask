@@ -5,7 +5,7 @@ class User {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column()
+  @Column({ unique: true })
   public user_name: string;
 
   @Column()

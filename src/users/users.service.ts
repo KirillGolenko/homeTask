@@ -20,11 +20,32 @@ export class UsersService {
     return older_token;
   }
 
+  async getByUserName(user_name: string) {
+    const user = await this.usersRepository.findOne({
+      where: { user_name: user_name },
+    });
+    if (user) {
+      return user;
+    }
+    throw new HttpException(
+      'User with this user_name does not exist',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
   async registration(@Body() data) {
     const { user_name } = data;
-    const newUser = await this.usersRepository.create(data);
-    await this.usersRepository.save(newUser);
-    return { token: this.createHash(user_name), data: newUser };
+
+    const user = await this.usersRepository.findOne({
+      where: { user_name: user_name },
+    });
+    if (!user) {
+      const newUser = await this.usersRepository.create(data);
+      await this.usersRepository.save(newUser);
+      return { token: this.createHash(user_name), data: newUser };
+    } else {
+      throw new HttpException('User already exists', HttpStatus.UNAUTHORIZED);
+    }
   }
 
   async login(@Body() data) {
