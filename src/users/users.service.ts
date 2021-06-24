@@ -20,22 +20,17 @@ export class UsersService {
     return older_token;
   }
 
-  randomInteger() {
-    return Math.round(1 + Math.random() * (999999 - 1 + 1));
-  }
-
   async registration(@Body() data) {
     const { user_name } = data;
-    // data.id = this.randomInteger();
-    const newPost = await this.usersRepository.create(data);
-    await this.usersRepository.save(newPost);
-    return { token: this.createHash(user_name), data: newPost };
+    const newUser = await this.usersRepository.create(data);
+    await this.usersRepository.save(newUser);
+    return { token: this.createHash(user_name), data: newUser };
   }
 
   async login(@Body() data) {
-    const { user_name } = data;
+    const { user_name, password } = data;
     const user = await this.usersRepository.findOne({
-      where: { user_name: user_name },
+      where: { user_name: user_name, password: password },
     });
     if (user) {
       return { token: this.createHash(user_name), data: user };
@@ -43,7 +38,19 @@ export class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async changePassword(@Body() data) {
+  async changePassword(data, id) {
     const { password } = data;
+    try {
+      await this.usersRepository.update(id, { password: password });
+    } catch (error) {
+      throw new HttpException('Wrong data', HttpStatus.NOT_FOUND);
+    }
+    const updatedPost = await this.usersRepository.findOne({
+      where: { id: id },
+    });
+    if (updatedPost) {
+      return updatedPost;
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 }

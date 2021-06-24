@@ -1,14 +1,25 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { DatabaseModule } from './database/database.module';
 import * as Joi from '@hapi/joi';
+import { ProductController } from './product/product.controller';
+import { DatabaseModule } from './database/database.module';
+import { ProductModule } from './product/product.module';
+import { UserMiddleware } from './checkUser.middleware';
+import { ImportModule } from './import/import.module';
+import { UsersModule } from './users/users.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import User from './model/user.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([User]),
     UsersModule,
+    ProductModule,
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         POSTGRES_HOST: Joi.string().required(),
@@ -20,8 +31,16 @@ import * as Joi from '@hapi/joi';
       }),
     }),
     DatabaseModule,
+    ImportModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(UserMiddleware)
+      .exclude({ path: 'product/:id', method: RequestMethod.GET }, 'cats/(.*)')
+      .forRoutes(ProductController);
+  }
+}
