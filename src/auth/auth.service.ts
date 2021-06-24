@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 import User from 'src/model/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { TokenPayload } from './tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +20,7 @@ export class AuthService {
         ...registrationData,
         password: hashedPassword,
       });
+      createdUser.password = undefined;
       return createdUser;
     } catch (error) {
       throw new HttpException(
@@ -30,9 +30,12 @@ export class AuthService {
     }
   }
 
-  public async getAuthenticatedUser(email: string, plainTextPassword: string) {
+  public async getAuthenticatedUser(
+    user_name: string,
+    plainTextPassword: string,
+  ) {
     try {
-      const user = await this.usersService.getByUserName(email);
+      const user = await this.usersService.getByUserName(user_name);
       await this.verifyPassword(plainTextPassword, user.password);
       user.password = undefined;
       return user;
@@ -66,5 +69,9 @@ export class AuthService {
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
     )}`;
+  }
+
+  public getCookieForLogOut() {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import User from 'src/model/user.entity';
 import { Repository } from 'typeorm';
 import * as jwt from 'jsonwebtoken';
+import { CreateUserDto } from 'src/dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -33,7 +34,7 @@ export class UsersService {
     );
   }
 
-  async registration(@Body() data) {
+  async registration(@Body() data: CreateUserDto) {
     const { user_name } = data;
 
     const user = await this.usersRepository.findOne({
@@ -42,7 +43,7 @@ export class UsersService {
     if (!user) {
       const newUser = await this.usersRepository.create(data);
       await this.usersRepository.save(newUser);
-      return { token: this.createHash(user_name), data: newUser };
+      return newUser;
     } else {
       throw new HttpException('User already exists', HttpStatus.UNAUTHORIZED);
     }
