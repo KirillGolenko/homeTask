@@ -1,15 +1,8 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from '@hapi/joi';
-import { ProductController } from './product/product.controller';
 import { DatabaseModule } from './database/database.module';
 import { ProductModule } from './product/product.module';
-import { UserMiddleware } from './checkUser.middleware';
 import { ImportModule } from './import/import.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -40,11 +33,4 @@ import User from './model/user.entity';
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(UserMiddleware)
-  //     .exclude({ path: 'product/:id', method: RequestMethod.GET }, 'cats/(.*)')
-  //     .forRoutes(ProductController);
-  // }
-}
+export class AppModule {}
