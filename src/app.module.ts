@@ -40,11 +40,11 @@ import User from './model/user.entity';
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(UserMiddleware)
-      .exclude({ path: 'product/:id', method: RequestMethod.GET }, 'cats/(.*)')
-      .forRoutes(ProductController);
-  }
+export class AppModule {
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(UserMiddleware)
+  //     .exclude({ path: 'product/:id', method: RequestMethod.GET }, 'cats/(.*)')
+  //     .forRoutes(ProductController);
+  // }
 }
