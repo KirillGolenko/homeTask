@@ -13,6 +13,7 @@ import { UserMiddleware } from './checkUser.middleware';
 import { ImportModule } from './import/import.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import User from './model/user.entity';
 
 @Module({
@@ -28,10 +29,13 @@ import User from './model/user.entity';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
     DatabaseModule,
     ImportModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
